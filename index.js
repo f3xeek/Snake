@@ -9,7 +9,7 @@ window.onload = function () {
                     turn_down_left:[128,0], turn_down_right:[0,0], turn_up_right:[0,64], turn_up_left:[128,128]}
   
                     //                                         [x,y] 
-    let snake = { head: [5, Math.round((N - 1) / 2)], turns: [[2,Math.round((N - 1) / 2)]],head_position:SPRITES.head_right, length: 4, moves:[] }
+    let snake = { head: [5, Math.round((N - 1) / 2)], turns: [[2,Math.round((N - 1) / 2)]], head_position:SPRITES.head_right, moves:[], length:4, facing:"ArrowRight", growing: false }
     let apple = [N-3 ,Math.round((N - 1) / 2)]
     let game = false
     canvas.setAttribute("width", SIZE*N)
@@ -104,8 +104,21 @@ window.onload = function () {
         ctx.stroke()
         draw_snake_and_apple()
     }
+    function checkApple(){
+        if (snake.head[0] === apple[0] && snake.head[1] === apple[1]){
+            snake.length+=1
+            snake.growing=true
+            apple = [Math.floor(Math.random()*N), Math.floor(Math.random()*N)]
+        }
+        
+    }
 
     function update() {
+        //skips moves untill one is valid, different axis than previosusly
+        while (snake.moves.length > 0 && (
+            (["ArrowDown", "ArrowUp"].includes(snake.moves[0])&&["ArrowDown", "ArrowUp"].includes(snake.facing))
+            ||(["ArrowLeft", "ArrowRight"].includes(snake.moves[0])&&["ArrowLeft", "ArrowRight"].includes(snake.facing))
+            )) snake.moves.splice(0,1)
         if (snake.moves.length===0){
             if (snake.head[0] !==  snake.turns[0][0]) {
                 let direction = snake.head[0] >  snake.turns[0][0] ? 1 : -1;
@@ -132,21 +145,29 @@ window.onload = function () {
                 snake.head[0]+=1
                 snake.head_position = SPRITES.head_right
             }
+            snake.facing = snake.moves[0]
             snake.moves.splice(0,1)
         }
 
-        let tail = snake.turns[snake.turns.length-1]
-        let tail_turn = snake.turns[snake.turns.length-2] || snake.head
-        if (tail[0]===tail_turn[0] && tail[1]===tail_turn[1])snake.turns.splice(snake.turns.length-2,1)
-        tail_turn = snake.turns[snake.turns.length-2] || snake.head
-        if (tail[0] !==  tail_turn[0]) {
-            let direction = tail[0] >  tail_turn[0] ? -1 : 1;
-            tail[0]+=direction
-        } else  {
-            let direction = tail[1] > tail_turn[1] ? -1 : 1;
-            tail[1]+=direction
+        checkApple()
+
+        if (!snake.growing){
+            let tail = snake.turns[snake.turns.length-1]
+            let tail_turn = snake.turns[snake.turns.length-2] || snake.head
+            if (tail[0]===tail_turn[0] && tail[1]===tail_turn[1])snake.turns.splice(snake.turns.length-2,1)
+            tail_turn = snake.turns[snake.turns.length-2] || snake.head
+            if (tail[0] !==  tail_turn[0]) {
+                let direction = tail[0] >  tail_turn[0] ? -1 : 1;
+                tail[0]+=direction
+            } else  {
+                let direction = tail[1] > tail_turn[1] ? -1 : 1;
+                tail[1]+=direction
+            }
+        }else{
+            snake.growing = false
         }
         drawFrame()
+        
 
     }
     function initialize() {
@@ -154,7 +175,7 @@ window.onload = function () {
         document.getElementById("body").onkeydown = (e)=>{
             if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(e.code)){
                 if (!game){
-                    test = setInterval(update,250)
+                    test = setInterval(update,200)
                     game=true
                 }
                 AddMoveToQueue(e)
