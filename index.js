@@ -104,13 +104,37 @@ window.onload = function () {
         ctx.stroke()
         draw_snake_and_apple()
     }
+    function checkForSnake([x,y]){
+        return snake.turns.some((turn,index)=>{
+            prevturn = snake.turns[index-1] ? snake.turns[index-1] : snake.head
+            if (turn[0] === x && turn[1] === y) return true
+            else if (turn[0] === prevturn[0]){
+                return x===turn[0] && ((turn[1] < y && prevturn[1] > y) || (turn[1] > y && prevturn[1] < y))
+            }
+            else if (turn[1] === prevturn[1]){
+                return y===turn[1] && ((turn[0] < x && prevturn[0] > x) || (turn[0] > x && prevturn[0] < x))
+            }
+            return false
+        })
+    }
+    
+    function checkForBorder() {
+        return (snake.head[0]>=19 || snake.head[1]>=19 )
+    }
+
+    function gameLost(){
+        clearInterval(test)
+        console.log("gameLost")
+        game = false
+    }
     function checkApple(){
         if (snake.head[0] === apple[0] && snake.head[1] === apple[1]){
             snake.length+=1
             snake.growing=true
-            apple = [Math.floor(Math.random()*N), Math.floor(Math.random()*N)]
+            do{
+                apple = [Math.floor(Math.random()*N), Math.floor(Math.random()*N)]
+            }while(checkForSnake(apple))
         }
-        
     }
 
     function update() {
@@ -149,25 +173,27 @@ window.onload = function () {
             snake.moves.splice(0,1)
         }
 
-        checkApple()
+        if(checkForBorder() || checkForSnake(snake.head)) gameLost()
+        else{
+            checkApple()
 
-        if (!snake.growing){
-            let tail = snake.turns[snake.turns.length-1]
-            let tail_turn = snake.turns[snake.turns.length-2] || snake.head
-            if (tail[0]===tail_turn[0] && tail[1]===tail_turn[1])snake.turns.splice(snake.turns.length-2,1)
-            tail_turn = snake.turns[snake.turns.length-2] || snake.head
-            if (tail[0] !==  tail_turn[0]) {
-                let direction = tail[0] >  tail_turn[0] ? -1 : 1;
-                tail[0]+=direction
-            } else  {
-                let direction = tail[1] > tail_turn[1] ? -1 : 1;
-                tail[1]+=direction
+            if (!snake.growing){
+                let tail = snake.turns[snake.turns.length-1]
+                let tail_turn = snake.turns[snake.turns.length-2] || snake.head
+                if (tail[0]===tail_turn[0] && tail[1]===tail_turn[1])snake.turns.splice(snake.turns.length-2,1)
+                tail_turn = snake.turns[snake.turns.length-2] || snake.head
+                if (tail[0] !==  tail_turn[0]) {
+                    let direction = tail[0] >  tail_turn[0] ? -1 : 1;
+                    tail[0]+=direction
+                } else  {
+                    let direction = tail[1] > tail_turn[1] ? -1 : 1;
+                    tail[1]+=direction
+                }
+            }else{
+                snake.growing = false
             }
-        }else{
-            snake.growing = false
+            drawFrame()
         }
-        drawFrame()
-        
 
     }
     function initialize() {
@@ -181,7 +207,7 @@ window.onload = function () {
                 AddMoveToQueue(e)
             }else if (e.code==="Space"){
                 clearInterval(test)
-                game= false
+                game = false
             }
         }
     }
