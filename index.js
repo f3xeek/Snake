@@ -173,8 +173,7 @@ window.onload = function () {
             snake.moves.splice(0,1)
         }
 
-        if(checkForBorder() || checkForSnake(snake.head)) gameLost()
-        else{
+        
             checkApple()
 
             if (!snake.growing){
@@ -192,8 +191,9 @@ window.onload = function () {
             }else{
                 snake.growing = false
             }
-            drawFrame()
-        }
+            if(checkForBorder() || checkForSnake(snake.head)) gameLost()
+            else drawFrame()
+
 
     }
     function initialize() {
