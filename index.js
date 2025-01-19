@@ -55,7 +55,6 @@ window.onload = function () {
                     //drawing turns
                     if (nextTurn){
                         const nextDir = nextTurn[1] - current_position[1] > 0 ? 1 : -1
-                        console.log(nextDir,direction, current_position, nextTurn)
                         if (direction>0){
                             if (nextDir>0)ctx.drawImage(spritesheet,SPRITES.turn_down_left[0],SPRITES.turn_down_left[1],64,64,current_position[0] * SIZE,current_position[1] * SIZE, SIZE, SIZE)
                             else ctx.drawImage(spritesheet,SPRITES.turn_up_left[0],SPRITES.turn_up_left[1],64,64,current_position[0] * SIZE,current_position[1] * SIZE, SIZE, SIZE)   
@@ -80,7 +79,6 @@ window.onload = function () {
                     if(direction===1) ctx.drawImage(spritesheet,SPRITES.tail_down[0],SPRITES.tail_down[1],64,64,current_position[0] * SIZE,current_position[1] * SIZE, SIZE, SIZE)
                     else ctx.drawImage(spritesheet,SPRITES.tail_up[0],SPRITES.tail_up[1],64,64,current_position[0] * SIZE,current_position[1] * SIZE, SIZE, SIZE)
                 }else{
-                    console.log(nextTurn)
                     if (nextTurn){
                         //drawing turns
                         const nextDir =nextTurn[0] - current_position[0] > 0 ? 1 : -1
@@ -93,9 +91,7 @@ window.onload = function () {
                         }
                     }
                 }
-            } else{
-               console.log("here")
-            }      
+            }     
     })
     }
     function AddMoveToQueue(e){
@@ -110,7 +106,6 @@ window.onload = function () {
     }
 
     function update() {
-        console.table(snake,)
         if (snake.moves.length===0){
             if (snake.head[0] !==  snake.turns[0][0]) {
                 let direction = snake.head[0] >  snake.turns[0][0] ? 1 : -1;
