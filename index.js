@@ -117,9 +117,9 @@ window.onload = function () {
             return false
         })
     }
-    
+
     function checkForBorder() {
-        return (snake.head[0]>=19 || snake.head[1]>=19 )
+        return (snake.head[0]>=N || snake.head[1]>=N )
     }
 
     function gameLost(){
@@ -133,7 +133,7 @@ window.onload = function () {
             snake.growing=true
             do{
                 apple = [Math.floor(Math.random()*N), Math.floor(Math.random()*N)]
-            }while(checkForSnake(apple))
+            }while(checkForSnake(apple) || (apple[0] === snake.head[0] && snake.head[1] === apple[1]))
         }
     }
 
